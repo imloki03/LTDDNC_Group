@@ -96,7 +96,7 @@ export default function HomeScreen() {
     return (
         <View className="flex-1 bg-gray-100">
             {/* Custom Top Bar */}
-            <View className="flex-row items-center justify-between px-4 py-2 bg-white shadow-md">
+            <View className="flex-row items-center justify-between px-4 py-2 bg-white shadow-md pt-7">
                 <Text className="text-lg font-bold flex-1 text-center">Home</Text>
                 <Menu
                     visible={visible}
