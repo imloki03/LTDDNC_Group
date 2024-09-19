@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, FlatList, TextInput, Alert } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, TouchableOpacity, FlatList, TextInput, Alert, ActivityIndicator } from 'react-native';
 import axios from 'axios';
 import { Menu, MenuItem, MenuDivider } from 'react-native-material-menu';
 import { Ionicons } from '@expo/vector-icons';
@@ -13,10 +13,16 @@ export default function HomeScreen() {
     const [visible, setVisible] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [projects, setProjects] = useState([]);
+    const [allProjects, setAllProjects] = useState([]);
     const [selectedProject, setSelectedProject] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [sortOrder, setSortOrder] = useState('asc');
     const [loading, setLoading] = useState(false);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [projectIterator, setProjectIterator] = useState(null);
+    const [showFooterLoader, setShowFooterLoader] = useState(false);
+    const [hasMoreProjects, setHasMoreProjects] = useState(true); // New state
+    const projectsPerPage = 10;
 
     const openMenu = () => setVisible(true);
     const closeMenu = () => setVisible(false);
@@ -47,15 +53,12 @@ export default function HomeScreen() {
             }
 
             const response = await axios.get(`${API_URL}projects/${email}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
+                headers: { Authorization: `Bearer ${token}` },
             });
-            if (response.data && response.data.data) {
-                setProjects(Array.isArray(response.data.data) ? response.data.data : []);
-            } else {
-                setProjects([]);
-            }
+
+            const projectList = response.data?.data || [];
+            setAllProjects(projectList);
+            initializeProjectGenerator(projectList);
         } catch (error) {
             Alert.alert('Error', 'Failed to fetch projects. Please try again later.');
             console.error(error);
@@ -64,10 +67,44 @@ export default function HomeScreen() {
         }
     };
 
+    function* projectGenerator(projectList) {
+        let index = 0;
+        while (index < projectList.length) {
+            yield projectList.slice(index, index + projectsPerPage);
+            index += projectsPerPage;
+        }
+    }
+
+    const initializeProjectGenerator = (projectList) => {
+        const iterator = projectGenerator(projectList);
+        setProjectIterator(iterator);
+        loadMoreProjects(iterator);
+    };
+
+    const loadMoreProjects = async (iterator) => {
+        if (!iterator) return;
+        setLoadingMore(true);
+        const nextChunk = iterator.next().value;
+        if (nextChunk && nextChunk.length > 0) {
+            setProjects(prevProjects => [...prevProjects, ...nextChunk]);
+        } else {
+            setHasMoreProjects(false); // No more projects to load
+        }
+        setLoadingMore(false);
+    };
+
+    const handleEndReached = useCallback(() => {
+        if (!loadingMore && projectIterator && hasMoreProjects) {
+            setShowFooterLoader(true);
+            setTimeout(() => {
+                setShowFooterLoader(false);
+                loadMoreProjects(projectIterator);
+            }, 2000);
+        }
+    }, [loadingMore, projectIterator, hasMoreProjects]);
+
     const filteredProjects = projects
-        .filter(project =>
-            project.name.toLowerCase().includes(searchQuery.toLowerCase())
-        )
+        .filter(project => project.name.toLowerCase().includes(searchQuery.toLowerCase()))
         .sort((a, b) => {
             const dateA = new Date(a.createDate);
             const dateB = new Date(b.createDate);
@@ -95,16 +132,11 @@ export default function HomeScreen() {
 
     return (
         <View className="flex-1 bg-gray-100">
-            {/* Custom Top Bar */}
             <View className="flex-row items-center justify-between px-4 py-2 bg-white shadow-md pt-7">
                 <Text className="text-lg font-bold flex-1 text-center">Home</Text>
                 <Menu
                     visible={visible}
-                    anchor={
-                        <TouchableOpacity onPress={openMenu}>
-                            <Ionicons name="settings-outline" size={24} color="black" />
-                        </TouchableOpacity>
-                    }
+                    anchor={<TouchableOpacity onPress={openMenu}><Ionicons name="settings-outline" size={24} color="black" /></TouchableOpacity>}
                     onRequestClose={closeMenu}
                 >
                     <MenuDivider />
@@ -113,7 +145,6 @@ export default function HomeScreen() {
                 </Menu>
             </View>
 
-            {/* Search Bar */}
             <View className="flex-row items-center px-4 py-2 bg-white shadow-md">
                 <TextInput
                     className="flex-1 h-10 border border-gray-300 rounded-md px-2"
@@ -129,7 +160,6 @@ export default function HomeScreen() {
                 </TouchableOpacity>
             </View>
 
-            {/* Project Cards */}
             {loading ? (
                 <Text className="text-center text-gray-500 mt-4">Loading projects...</Text>
             ) : (
@@ -139,10 +169,19 @@ export default function HomeScreen() {
                     keyExtractor={(item) => item.id.toString()}
                     numColumns={2}
                     columnWrapperStyle="justify-between"
+                    onEndReached={handleEndReached}
+                    onEndReachedThreshold={0.5}
+                    ListFooterComponent={
+                        showFooterLoader && hasMoreProjects ? (
+                            <View className="py-4">
+                                <ActivityIndicator size="large" color="#0000ff" />
+                                <Text className="text-center text-gray-500 mt-2">Loading more projects...</Text>
+                            </View>
+                        ) : null
+                    }
                 />
             )}
 
-            {/* Modal for Project Details */}
             {selectedProject && (
                 <ProjectDetailModal
                     isVisible={isModalVisible}
