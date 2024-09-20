@@ -63,3 +63,5 @@ Người dùng quản lý dự án có thể sao lưu phiên bản ổn định 
 ### Quản Lý lưu trữ
 
 Người dùng có thể lưu trữ các file liên quan đến dự án dưới nhiều định dạng khác nhau như tài liệu, hình ảnh, bản trình bày,... Hệ thống cũng lưu lại các phiên bản cũ của file khi người dùng cập nhật phiên bản mới.
+
+![Sơ Đồ Usecase](https://github.com/imloki03/LTDDNC_Group/blob/main/Usercase.png)
