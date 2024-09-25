@@ -22,6 +22,8 @@ export default function RegisterScreen({ navigation }) {
             });
             if (response.data.status === 200) {
                 Alert.alert('Registration Successful', 'You have registered successfully!');
+                await AsyncStorage.setItem('token', response.data.data.token);
+                await AsyncStorage.setItem('email', email);
                 navigation.navigate('Home');
             } else {
                 Alert.alert('Registration Failed', response.data.message || 'An error occurred.');
