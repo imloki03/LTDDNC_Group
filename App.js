@@ -8,24 +8,47 @@ import HomeScreen from './src/screens/HomeScreen';
 import ForgotPasswordScreen from './src/screens/ForgotPasswordScreen';
 import EditProfileScreen from './src/screens/ProfileScreen';
 import ProjectDetailScreen from './src/screens/ProjectDetailScreen';
+import ScreenWithNavBar from './src/screens/ScreenWithNavBar';
+import { NavBarProvider } from './src/screens/NavBarContext';
 
 const Stack = createStackNavigator();
 
 export default function App() {
     return (
-        <NavigationContainer>
-            <Stack.Navigator initialRouteName="Login">
-                <Stack.Screen name="Login" component={LoginScreen} />
-                <Stack.Screen name="Register" component={RegisterScreen} />
-                <Stack.Screen
-                    name="Home"
-                    component={HomeScreen}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
-                <Stack.Screen name="EditProfile" component={EditProfileScreen} />
-                <Stack.Screen name="ProjectDetail" component={ProjectDetailScreen} />
-            </Stack.Navigator>
-        </NavigationContainer>
+        <NavBarProvider>
+            <NavigationContainer>
+                <Stack.Navigator initialRouteName="Login">
+                    <Stack.Screen name="Login" component={LoginScreen} />
+                    <Stack.Screen name="Register" component={RegisterScreen} />
+                    <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+
+                    <Stack.Screen
+                        name="Home"
+                        children={() => (
+                            <ScreenWithNavBar>
+                                <HomeScreen />
+                            </ScreenWithNavBar>
+                        )}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="EditProfile"
+                        children={() => (
+                            <ScreenWithNavBar>
+                                <EditProfileScreen />
+                            </ScreenWithNavBar>
+                        )}
+                    />
+                    <Stack.Screen
+                        name="ProjectDetail"
+                        children={() => (
+                            <ScreenWithNavBar>
+                                <ProjectDetailScreen />
+                            </ScreenWithNavBar>
+                        )}
+                    />
+                </Stack.Navigator>
+            </NavigationContainer>
+        </NavBarProvider>
     );
 }
