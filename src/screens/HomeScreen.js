@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Text, TouchableOpacity, FlatList, TextInput, Alert, ActivityIndicator } from 'react-native';
 import axios from 'axios';
 import { Menu, MenuItem, MenuDivider } from 'react-native-material-menu';
@@ -21,8 +21,10 @@ export default function HomeScreen() {
     const [loadingMore, setLoadingMore] = useState(false);
     const [projectIterator, setProjectIterator] = useState(null);
     const [showFooterLoader, setShowFooterLoader] = useState(false);
-    const [hasMoreProjects, setHasMoreProjects] = useState(true); // New state
+    const [hasMoreProjects, setHasMoreProjects] = useState(true);
     const projectsPerPage = 10;
+
+    const isFirstLoad = useRef(true);
 
     const openMenu = () => setVisible(true);
     const closeMenu = () => setVisible(false);
@@ -42,7 +44,11 @@ export default function HomeScreen() {
     }, []);
 
     const fetchProjects = async () => {
-        setLoading(true);
+        if (isFirstLoad.current) {
+            setLoading(true);
+            setProjects([]);
+        }
+
         try {
             const token = await AsyncStorage.getItem('token');
             const email = await AsyncStorage.getItem('email');
@@ -58,7 +64,11 @@ export default function HomeScreen() {
 
             const projectList = response.data?.data || [];
             setAllProjects(projectList);
-            initializeProjectGenerator(projectList);
+
+            if (isFirstLoad.current) {
+                initializeProjectGenerator(projectList);
+                isFirstLoad.current = false;
+            }
         } catch (error) {
             Alert.alert('Error', 'Failed to fetch projects. Please try again later.');
             console.error(error);
@@ -88,7 +98,7 @@ export default function HomeScreen() {
         if (nextChunk && nextChunk.length > 0) {
             setProjects(prevProjects => [...prevProjects, ...nextChunk]);
         } else {
-            setHasMoreProjects(false); // No more projects to load
+            setHasMoreProjects(false);
         }
         setLoadingMore(false);
     };
@@ -140,7 +150,6 @@ export default function HomeScreen() {
                     onRequestClose={closeMenu}
                 >
                     <MenuDivider />
-                    <MenuItem onPress={() => { closeMenu(); navigation.navigate('EditProfile'); }}>Edit Profile</MenuItem>
                     <MenuItem onPress={() => { closeMenu(); navigation.navigate('Login'); }}>Logout</MenuItem>
                 </Menu>
             </View>
