@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Alert } from 'react-native';
+import { View, StyleSheet, Alert, Image } from 'react-native';
 import { login } from '../api/authApi';
 import TextField from '../components/TextField';
 import Button from '../components/Button';
@@ -35,6 +35,10 @@ const LoginScreen = () => {
 
     return (
         <View style={styles.container}>
+            <Image
+                source={require('../../assets/logo.png')}
+                style={styles.logo}
+            />
             <TextField
                 label="Email"
                 value={email}
@@ -66,8 +70,15 @@ const LoginScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
         padding: 16,
+    },
+    logo: {
+        width: '80%',
+        height: undefined,
+        aspectRatio: 1, 
+        resizeMode: 'contain',
+        marginBottom: 0,
+        marginLeft: 37,
     },
 });
 

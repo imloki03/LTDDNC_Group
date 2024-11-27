@@ -27,7 +27,7 @@ export const getMessagesByProject = async (projectId) => {
     }
 };
 
-export const searchMessages = async (keyword) => {
+export const searchMessages = async (projectId, keyword) => {
     try {
         const response = await axios.get(`${API_URL}chat/project/${projectId}/search`, {
             params: { keyword },

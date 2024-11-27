@@ -118,7 +118,7 @@ const ChatScreen = () => {
 
     const handleSearch = () => {
         if (searchQuery.trim()) {
-            searchMessages(searchQuery)
+            searchMessages(projectId, searchQuery)
                 .then((data) => {
                     setSearchResults(data.data);
                 })
