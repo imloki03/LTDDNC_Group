@@ -14,11 +14,11 @@ Final term project of the "Advanced Mobile Programming" course - Project Managem
 
 ## Use Case Diagram
 
-![Use Case Diagram](./assets/usecase_diagram.jpg)
+![Use Case Diagram](./assets/usecase_diagram.png)
 
 ## Class Diagram
 
-![Class Diagram](./assets/class_diagram.jpg)
+![Class Diagram](./assets/class_diagram.png)
 
 ## Installation
 
