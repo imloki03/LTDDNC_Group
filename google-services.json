@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1079334863903",
+    "project_id": "projectctandroid",
+    "storage_bucket": "projectctandroid.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1079334863903:android:d400c83e24e8846a7d012a",
+        "android_client_info": {
+          "package_name": "com.hcmute.projectCT"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDgtLKEiwZj2YBOLqETuB1rwnGP_Sqnbls"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
